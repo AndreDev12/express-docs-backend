@@ -27,6 +27,21 @@ const requestTime = function (req, res, next) {
 
 app.use('/birds', birds);
 app.use('/', myLogger, requestTime, mw({ option1: '1', option2: '2' }));
+app.use((req, res, next) => {
+  console.log('Time:', Date.now());
+  next();
+});
+app.use(
+  '/user/:id',
+  (req, res, next) => {
+    console.log('Request URL:', req.originalUrl);
+    next();
+  },
+  (req, res, next) => {
+    console.log('Request Type:', req.method);
+    next();
+  }
+);
 
 // Verbos
 app.get('/', (req, res) => {
@@ -48,6 +63,19 @@ app.get(
   },
   (req, res) => res.send('Hello from D!')
 );
+app.get(
+  '/user/:id',
+  (req, res, next) => {
+    console.log('ID:', req.params.id);
+    next();
+  },
+  (req, res, next) => {
+    res.send('User Info');
+  }
+);
+app.get('/user/:id', (req, res, next) => {
+  res.send(req.params.id);
+});
 
 // app.route()
 app
