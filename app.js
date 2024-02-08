@@ -66,15 +66,19 @@ app.get(
 app.get(
   '/user/:id',
   (req, res, next) => {
-    console.log('ID:', req.params.id);
-    next();
+    // if the USER is 0, skip to the next router
+    if (req.params.id === '0') next('route');
+    // otherwise pass the control to the next middleware function in this stack
+    else next();
   },
   (req, res, next) => {
-    res.send('User Info');
+    // send a regular response
+    res.send('regular');
   }
 );
+// handler for the /user/:id path, which sends a special response
 app.get('/user/:id', (req, res, next) => {
-  res.send(req.params.id);
+  res.send('special');
 });
 
 // app.route()
