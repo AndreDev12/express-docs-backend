@@ -1,6 +1,9 @@
 const express = require('express');
+
+const mw = require('./myMiddleware');
+const { userById } = require('./userById');
 const birds = require('./birds');
-const mw = require('./my-middleware');
+
 const app = express();
 const port = 8080;
 
@@ -26,22 +29,8 @@ const requestTime = function (req, res, next) {
 };
 
 app.use('/birds', birds);
+app.use('/users', userById);
 app.use('/', myLogger, requestTime, mw({ option1: '1', option2: '2' }));
-app.use((req, res, next) => {
-  console.log('Time:', Date.now());
-  next();
-});
-app.use(
-  '/user/:id',
-  (req, res, next) => {
-    console.log('Request URL:', req.originalUrl);
-    next();
-  },
-  (req, res, next) => {
-    console.log('Request Type:', req.method);
-    next();
-  }
-);
 
 // Verbos
 app.get('/', (req, res) => {
@@ -63,23 +52,6 @@ app.get(
   },
   (req, res) => res.send('Hello from D!')
 );
-app.get(
-  '/user/:id',
-  (req, res, next) => {
-    // if the USER is 0, skip to the next router
-    if (req.params.id === '0') next('route');
-    // otherwise pass the control to the next middleware function in this stack
-    else next();
-  },
-  (req, res, next) => {
-    // send a regular response
-    res.send('regular');
-  }
-);
-// handler for the /user/:id path, which sends a special response
-app.get('/user/:id', (req, res, next) => {
-  res.send('special');
-});
 
 // app.route()
 app
